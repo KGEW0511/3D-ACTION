@@ -31,6 +31,7 @@ public class Shop : MonoBehaviour
     public void Buy(int index)
     {
         int price = itemPrice[index];
+
         if(price > enterPlayer.coin)
         {
             StopCoroutine(Talk());
