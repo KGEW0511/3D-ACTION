@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
@@ -26,6 +27,7 @@ public class GameManager : MonoBehaviour
 
     public GameObject menuPanel;
     public GameObject gamePanel;
+    public GameObject overPanel;
     public Text maxScoreTxt;
     public Text scoreTxt;
     public Text stageTxt;
@@ -42,12 +44,16 @@ public class GameManager : MonoBehaviour
     public Text enemyCTxt;
     public RectTransform bossHealthGroup;
     public RectTransform bossHealthBar;
+    public Text curScoreText;
+    public Text bestText;
 
     private void Awake()
     {
         enemyList = new List<int>();
-
         maxScoreTxt.text = string.Format("{0:n0}", PlayerPrefs.GetInt("MaxScore"));
+
+        if (PlayerPrefs.HasKey("MaxScore"))
+            PlayerPrefs.SetInt("MaxScore", 0);
     }
 
     public void GameStart()
@@ -59,6 +65,24 @@ public class GameManager : MonoBehaviour
         gamePanel.SetActive(true);
 
         player.gameObject.SetActive(true);
+    }
+    public void GameOver()
+    {
+        gamePanel.SetActive(false);
+        overPanel.SetActive(true);
+        curScoreText.text = scoreTxt.text;
+
+        int maxScore = PlayerPrefs.GetInt("MaxScore");
+        if(player.score > maxScore)
+        {
+            bestText.gameObject.SetActive(true);
+            PlayerPrefs.SetInt("MaxScore", player.score);
+        }
+    }
+
+    public void ReStart()
+    {
+        SceneManager.LoadScene(0);
     }
 
     public void StageStart()
@@ -95,12 +119,13 @@ public class GameManager : MonoBehaviour
         isBattle = false;
         stage++;
     }
+
     IEnumerator InBattle()
     {
         if(stage % 5 == 0)
         {
             enemyCntD++;
-            GameObject instantEnemy = Instantiate(enemies[3], enemyZones[2].position, enemyZones[2].rotation);
+            GameObject instantEnemy = Instantiate(enemies[3], enemyZones[0].position + new Vector3(0, 0, 10), enemyZones[0].rotation);
             Enemy enemy = instantEnemy.GetComponent<Enemy>();
             enemy.target = player.transform;
             enemy.manager = this;

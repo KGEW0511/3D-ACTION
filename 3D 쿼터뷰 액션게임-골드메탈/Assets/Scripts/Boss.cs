@@ -30,8 +30,10 @@ public class Boss : Enemy
         if (isDead)
         {
             StopAllCoroutines();
+            meleeArea.enabled = false;
             return;
         }
+
         if (isLook)
         {
             float h = Input.GetAxisRaw("Horizontal");

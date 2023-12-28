@@ -156,14 +156,15 @@ public class Enemy : MonoBehaviour
         if(other.tag == "Melee")
         {
             Weapon weapon = other.GetComponent<Weapon>();
-            curHealth -= weapon.damage;
+            
+            curHealth = (curHealth - weapon.damage) > 0 ? curHealth - weapon.damage : 0;
             Vector3 reactVec = transform.position - other.transform.position;
             StartCoroutine(OnDamage(reactVec, false));
         }
         else if(other.tag == "Bullet")
         {
             Bullet bullet = other.GetComponent<Bullet>();
-            curHealth -= bullet.damage;
+            curHealth = (curHealth - bullet.damage) > 0 ? curHealth - bullet.damage : 0;
             Vector3 reactVec = transform.position - other.transform.position;
             Destroy(other.gameObject);
             StartCoroutine(OnDamage(reactVec, false));
@@ -172,7 +173,7 @@ public class Enemy : MonoBehaviour
 
     public void HitByGrenade(Vector3 exposionPos)
     {
-        curHealth -= 100;
+        curHealth = (curHealth - 100 > 0) ? curHealth - 100 : 0;
         Vector3 reactVec = transform.position - exposionPos;
         StartCoroutine(OnDamage(reactVec, true));
     }
@@ -184,14 +185,13 @@ public class Enemy : MonoBehaviour
 
         yield return new WaitForSeconds(0.1f);
 
-        if(curHealth > 0)
+        if(curHealth > 0 && !isDead)
         {
             foreach (MeshRenderer mesh in meshs)
                 mesh.material.color = Color.white;
         }
         else
         {
-            curHealth = 0;
             foreach (MeshRenderer mesh in meshs)
                 mesh.material.color = Color.gray;
 
